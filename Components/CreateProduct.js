@@ -1,6 +1,3 @@
-import React, { useState } from 'react'
-import Profile from "./Profile";
-import PushScreen from '../Init/PushScreen'
 import {
     SafeAreaView,
     ScrollView,
@@ -15,20 +12,68 @@ import {
     ImageBackground,
     useColorScheme,
     View,
+
 } from 'react-native';
-export default function Lab2({ navigation }) {
-    const [ten, setTen] = useState('');
-    const [tuoi, setTuoi] = useState('');
-    const [chuyennganh, setChuyenNganh] = useState('');
-    const [email, setEmail] = useState('');
-    const [display, setDisplay] = useState(false);
+import React from 'react';
+import { Picker } from '@react-native-picker/picker';
+import { useState } from 'react';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+
+
+function CreateProduct() {
+    const [title, setTitle] = useState('');
+    const [price, setPrice] = useState('');
+    const [description, setDescription] = useState('');
+    const [category, setCategory] = useState('');
     const [error, setError] = useState({
-        ten: "",
-        tuoi: '',
-        chuyennganh: '',
-        email: ''
+        title: "",
+        price: '',
+        description: '',
+        category: ''
 
     });
+    const [filePath, setFilePath] = useState('');
+
+    const chooseFile = () => {
+        let options = {
+            title: 'Select Image',
+            customButtons: [
+                {
+                    name: 'customOptionKey',
+                    title: 'Choose Photo from Custom Option'
+                },
+            ],
+            storageOptions: {
+                skipBackup: true,
+                path: 'images',
+            },
+        };
+        launchImageLibrary(options, (response) => {
+            console.log('Response = ', response);
+
+            if (response.didCancel) {
+                console.log('User cancelled image picker');
+            } else if (response.error) {
+                console.log('ImagePicker Error: ', response.error);
+            } else if (response.customButton) {
+                console.log(
+                    'User tapped custom button: ',
+                    response.customButton
+                );
+                alert(response.customButton);
+            } else {
+                let source = response;
+                // You can also display the image using data:
+                // let source = {
+                //   uri: 'data:image/jpeg;base64,' + response.data
+                // };
+                // console.log("obj: ", response)
+                setFilePath(source.assets[0].uri);
+                // console.log(source.assets[0].uri)
+            }
+        });
+    }
+
     let checkValidation = false
     function Validation(ten, tuoi, chuyennganh) {
         // let tenformat = /[a-z A-Z ]/g;
@@ -84,31 +129,21 @@ export default function Lab2({ navigation }) {
     }
 
 
-
-
-    let profile1 = {
-        name: ten,
-        age: tuoi,
-        sex: chuyennganh,
-        email: email
-    }
     return (
-        display ? <Profile profile={profile1} display={display} setHienthi={setDisplay} /> :
+        <ScrollView>
             <View style={{ alignItems: 'center', margin: 30 }}>
-                <TextInput placeholder='Tên' onChangeText={setTen} value={ten} style={{
+                <TextInput placeholder='Title' onChangeText={setTitle} value={title} style={{
                     color: 'black',
                     marginTop: 30,
                     fontSize: 16,
                     paddingStart: 20,
-                    // borderColor: 'red',
-                    // borderWidth: 1,
                     backgroundColor: "#DDDDDD",
                     height: 60,
                     width: "90%",
                     borderRadius: 20, paddingLeft: 10
                 }}></TextInput>
-                {(error.ten != '') ? <Text>{error.ten}</Text> : null}
-                <TextInput keyboardType='numeric' placeholder='Tuổi' onChangeText={setTuoi} value={tuoi} style={{
+                {(error.title != '') ? <Text>{error.title}</Text> : null}
+                <TextInput keyboardType='numeric' placeholder='Price' onChangeText={setPrice} value={price} style={{
                     color: 'black',
                     marginTop: 30,
                     fontSize: 16,
@@ -118,20 +153,21 @@ export default function Lab2({ navigation }) {
                     height: 60,
                     borderRadius: 20, paddingLeft: 10
                 }}></TextInput>
-                {(error.tuoi != '') ? <Text>{error.tuoi}</Text> : null}
+                {(error.price != '') ? <Text>{error.price}</Text> : null}
 
-                <TextInput placeholder='Chuyên Ngành' onChangeText={setChuyenNganh} value={chuyennganh} style={{
+                <TextInput placeholder='Description' onChangeText={setDescription} value={description} style={{
                     color: 'black',
                     marginTop: 30,
                     fontSize: 16,
                     paddingStart: 20,
                     width: "90%",
+                    backgroundColor: "#DDDDDD",
+                    height: 60,
+                    borderRadius: 20, paddingLeft: 10
+                }}></TextInput>
+                {(error.description != '') ? <Text>{error.description}</Text> : null}
 
-                    backgroundColor: "#DDDDDD",
-                    height: 60,
-                    borderRadius: 20, paddingLeft: 10
-                }}></TextInput>
-                <TextInput placeholder='Email' keyboardType='email-address' onChangeText={setEmail} value={email} style={{
+                <TextInput placeholder='Category' onChangeText={setCategory} value={category} style={{
                     color: 'black',
                     marginTop: 30,
                     fontSize: 16,
@@ -141,16 +177,41 @@ export default function Lab2({ navigation }) {
                     height: 60,
                     borderRadius: 20, paddingLeft: 10
                 }}></TextInput>
-                {(error.chuyennganh != '') ? <Text>{error.chuyennganh}</Text> : null}
+                {(error.category != '') ? <Text>{error.category}</Text> : null}
+                <View style={{
+                    height: 60,
+                    width: '90%',
+                    backgroundColor: "#DDDDDD",
+                    borderRadius: 20,
+                    marginTop: 30,
+                }}>
+                    <Picker>
+                        <Picker.Item label="Java" value="java" />
+                        <Picker.Item label="JavaScript" value="js" />
+                    </Picker>
+                </View>
+                <TouchableOpacity style={{
+                    marginTop: 20,
+                    width: 300, height: 60,
+                    backgroundColor: 'orange',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    borderRadius: 20
+                }} onPress={chooseFile}>
+                    <Text>
+                        CHOICE IMAGE
+                    </Text>
+                </TouchableOpacity>
+
+                <Image style={{
+                    width: '100%',
+                    height: 300,
+                }} source={{ uri: filePath }}></Image>
 
                 <TouchableOpacity
                     onPress={
                         () => {
-                            // setDisplay(!display)
-                            Validation(ten, tuoi, chuyennganh)
-                            if (checkValidation) {
-                                setDisplay(!display)
-                            }
+                            console.log(source.assets[0].uri)
                         }
                     }
                     style={{
@@ -161,25 +222,10 @@ export default function Lab2({ navigation }) {
                         alignItems: 'center',
                         borderRadius: 20
                     }}>
-                    <Text>SAVE</Text>
+                    <Text>POST</Text>
                 </TouchableOpacity>
-
-                <TouchableOpacity onPress={
-                    () => PushScreen({ navigation }, 'HomeScreen')
-
-                }
-                    style={{
-                        marginTop: 20,
-                        width: 300, height: 60,
-                        backgroundColor: 'orange',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        borderRadius: 20
-                    }}>
-                    <Text>PREVIEW</Text>
-                </TouchableOpacity>
-
-
             </View >
-    )
+        </ScrollView>
+    );
 }
+export default CreateProduct
