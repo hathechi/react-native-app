@@ -211,7 +211,7 @@ function CreateProduct() {
                 <TouchableOpacity
                     onPress={
                         () => {
-                            console.log(source.assets[0].uri)
+                            // console.log(source.assets[0].uri)
                         }
                     }
                     style={{
