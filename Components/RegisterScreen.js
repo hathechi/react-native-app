@@ -1,8 +1,14 @@
-import React, { useState } from 'react';
-import PushScreen from '../Init/PushScreen';
+import React, { useEffect, useState } from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import DatePicker from 'react-native-date-picker'
+import { compareAsc, format } from 'date-fns'
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from "yup";
 
+import { initializeApp } from "firebase/app";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { firebaseConfig } from "../config_firebase";
 import {
     SafeAreaView,
     ScrollView,
@@ -16,16 +22,84 @@ import {
     ImageBackground,
     useColorScheme,
     View,
+    Alert,
 } from 'react-native';
+import { da } from 'date-fns/locale';
+
+
 export default function RegisterScreen({ navigation }) {
-    const [user, setUser] = useState('')
-    const [pass, setPass] = useState('')
-    const [cfpass, setCfPass] = useState('')
-    const [email, setEmail] = useState('')
+    const app = initializeApp(firebaseConfig)
+    const auth = getAuth(app)
+
+
+    const schema = yup.object({
+        user: yup.string().required(),
+        pass: yup.number().positive().integer().required(),
+        cfpass: yup.number().positive().integer().required(),
+        email: yup.string().email().required(),
+        date: yup.string(),
+    }).required();
+
+    const {
+        control,
+        handleSubmit,
+        formState: { errors },
+    } = useForm({
+        defaultValues: {
+            user: '',
+            pass: '',
+            cfpass: '',
+            email: '',
+            date: format(new Date(), 'dd-MM-yyyy')
+        },
+        resolver: yupResolver(schema)
+
+    });
+
+
+    // const [user, setUser] = useState('')
+    // const [pass, setPass] = useState('')
+    // const [cfpass, setCfPass] = useState('')
+    // const [email, setEmail] = useState('')
     const [date, setDate] = useState(new Date())
     const [isShowPass, setIsShowPass] = useState(true)
     //open datePicker
     const [open, setOpen] = useState(false)
+    //FireBase
+    const handleSignUpAuth = async (email, password, name) => {
+        await createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                // Signed in 
+                const user = userCredential.user;
+                console.log("firebase", user.email)
+                if (user != null) {
+
+                    Alert.alert('Register Successful')
+                    console.log("userName", auth.currentUser.email)
+                    //Chuyển màn khi đăng kí thành công
+                    // { navigation.navigate('HomeScreen') }
+                }
+
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                console.log(errorMessage, errorCode)
+            });
+    }
+
+    const onSubmit = (data) => {
+        data.date = format(date, 'dd-MM-yyyy')
+
+        if (data.pass != data.cfpass) {
+            Alert.alert('two passwords must be the same')
+        } else {
+            handleSignUpAuth(data.email, data.pass)
+            console.log("DATA : ", data.email, data.pass);
+
+        }
+
+    }
 
     return (
         <SafeAreaView style={{
@@ -54,107 +128,96 @@ export default function RegisterScreen({ navigation }) {
                     }} source={require('../assets/images/register.png')} />
                 </View>
                 <View style={{ marginStart: 20, marginEnd: 20, marginTop: 20 }}>
-                    <View style={{
-                        color: 'black',
-                        marginTop: 20,
-                        borderRadius: 20,
-                        paddingLeft: 10,
-                        backgroundColor: "#DDDDDD",
-                        flexDirection: 'row',
-                        alignItems: 'center'
-                    }}>
-                        <Icon name='user' size={22} style={{
-                            marginLeft: 20,
-                            marginEnd: 10,
-                        }} />
-                        <TextInput placeholder='Username' onChangeText={setUser} value={user} style={{
-                            fontSize: 16,
-                            width: '80%',
-                            height: 60,
-                        }}></TextInput>
-                    </View>
-                    <View style={{
-                        color: 'black',
-                        marginTop: 30,
-                        borderRadius: 20,
-                        paddingLeft: 10,
-                        backgroundColor: "#DDDDDD",
-                        flexDirection: 'row',
-                        alignItems: 'center'
-                    }}>
-                        <Icon name='lock' size={22} style={{
-                            marginLeft: 20,
-                            marginEnd: 10,
-                        }} />
-                        <TextInput maxLength={6} keyboardType={'number-pad'} placeholder='Password' secureTextEntry={isShowPass} onChangeText={setPass} value={pass} style={{
-                            fontSize: 16,
-                            width: '80%',
-                            height: 60,
-                        }}></TextInput>
-                        <TouchableOpacity onPress={() => setIsShowPass(!isShowPass)}>
-                            {isShowPass ? <Icon name='eye-slash' size={22} style={{
-                                marginRight: 20,
-                            }} /> : <Icon name='eye' size={22} style={{
-                                marginRight: 20,
-                            }} />}
-                        </TouchableOpacity>
-                    </View>
-                    <View style={{
-                        color: 'black',
-                        marginTop: 30,
-                        borderRadius: 20,
-                        paddingLeft: 10,
-                        backgroundColor: "#DDDDDD",
-                        flexDirection: 'row',
-                        alignItems: 'center'
-                    }}>
-                        <Icon name='lock' size={22} style={{
-                            marginLeft: 20,
-                            marginEnd: 10,
-                        }} />
-                        <TextInput maxLength={6} keyboardType={'number-pad'} placeholder='Comfirm Password' secureTextEntry={isShowPass} onChangeText={setCfPass} value={cfpass} style={{
-                            fontSize: 16,
-                            width: '80%',
-                            height: 60,
-                        }}></TextInput>
-                        <TouchableOpacity onPress={() => setIsShowPass(!isShowPass)}>
-                            {isShowPass ? <Icon name='eye-slash' size={22} style={{
-                                marginRight: 20,
-                            }} /> : <Icon name='eye' size={22} style={{
-                                marginRight: 20,
-                            }} />}
-                        </TouchableOpacity>
-
-                    </View>
-                    <View style={{
-                        color: 'black',
-                        marginTop: 30,
-                        borderRadius: 20,
-                        paddingLeft: 10,
-                        backgroundColor: "#DDDDDD",
-                        flexDirection: 'row',
-                        alignItems: 'center'
-                    }}>
+                    <View style={[styles.viewStyle, errors.email && styles.borderError]}>
                         <Icon name='envelope' size={22} style={{
                             marginLeft: 20,
                             marginEnd: 10,
                         }} />
-                        <TextInput placeholder='Email' keyboardType='email-address' onChangeText={setEmail} value={email} style={{
-                            fontSize: 16,
-                            width: '80%',
-                            height: 60,
-                        }}></TextInput>
+                        <Controller
+                            control={control}
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <TextInput
+                                    keyboardType={'email-address'}
+                                    placeholder='Email'
+                                    onChangeText={onChange} value={value}
+                                    style={styles.textInput}></TextInput>
+                            )}
+                            name="email"
+                        ></Controller>
                     </View>
-                    <View style={{
-                        color: 'black',
-                        marginTop: 30,
-                        borderRadius: 20,
-                        paddingLeft: 10,
-                        height: 60,
-                        backgroundColor: "#DDDDDD",
-                        flexDirection: 'row',
-                        alignItems: 'center'
-                    }}>
+                    {errors.email && <Text style={styles.textError}>{errors.email.message}</Text>}
+
+                    <View style={[styles.viewStyle, errors.pass && styles.borderError]}>
+                        <Icon name='lock' size={22} style={{
+                            marginLeft: 20,
+                            marginEnd: 10,
+                        }} />
+                        <Controller
+                            control={control}
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <TextInput maxLength={6}
+                                    keyboardType={'number-pad'}
+                                    placeholder='Password' secureTextEntry={isShowPass}
+                                    onChangeText={onChange} value={value}
+                                    style={styles.textInput}></TextInput>
+                            )}
+                            name="pass"
+                        ></Controller>
+                        <TouchableOpacity onPress={() => setIsShowPass(!isShowPass)}>
+                            {isShowPass ? <Icon name='eye-slash' size={22} style={{
+                                marginRight: 20,
+                            }} /> : <Icon name='eye' size={22} style={{
+                                marginRight: 20,
+                            }} />}
+                        </TouchableOpacity>
+                    </View>
+                    {errors.pass && <Text style={styles.textError}>{errors.pass.message}</Text>}
+                    <View style={[styles.viewStyle, errors.pass && styles.borderError]}>
+                        <Icon name='lock' size={22} style={{
+                            marginLeft: 20,
+                            marginEnd: 10,
+                        }} />
+                        <Controller
+                            control={control}
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <TextInput maxLength={6}
+                                    keyboardType={'number-pad'}
+                                    placeholder='Comfirm Password' secureTextEntry={isShowPass}
+                                    onChangeText={onChange} value={value}
+                                    style={styles.textInput}></TextInput>
+                            )}
+                            name="cfpass"
+                        ></Controller>
+                        <TouchableOpacity onPress={() => setIsShowPass(!isShowPass)}>
+                            {isShowPass ? <Icon name='eye-slash' size={22} style={{
+                                marginRight: 20,
+                            }} /> : <Icon name='eye' size={22} style={{
+                                marginRight: 20,
+                            }} />}
+                        </TouchableOpacity>
+                    </View>
+                    {errors.cfpass && <Text style={styles.textError}>{errors.cfpass.message}</Text>}
+                    <View style={[styles.viewStyle, errors.user && styles.borderError]}>
+                        <Icon name='user' size={22} style={{
+                            marginLeft: 20,
+                            marginEnd: 10,
+                        }} />
+                        <Controller
+                            control={control}
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <TextInput placeholder='Name'
+                                    onChangeText={onChange}
+                                    value={value}
+                                    style={[styles.textInput]}>
+                                </TextInput>
+                            )}
+                            name="user"
+                        ></Controller>
+                    </View>
+                    {errors.user && <Text style={styles.textError}>{errors.user.message}</Text>}
+
+
+                    <View style={[styles.viewStyle]}>
                         <Icon name='calendar' size={22} style={{
                             marginLeft: 20,
                             marginEnd: 10,
@@ -163,13 +226,27 @@ export default function RegisterScreen({ navigation }) {
                             width: '80%',
                             height: 60,
                             justifyContent: 'center'
-                        }} onPress={() => {
-                            setOpen(!open)
-                        }}>
-                            <TextInput on editable={false} selectTextOnFocus={false} placeholder={'Date'} value={date}
-                                style={{
-                                    fontSize: 16,
-                                }} />
+                        }} onPress={
+                            () => {
+                                setOpen(!open)
+                            }
+                        }>
+                            <Controller
+                                control={control}
+                                render={({ field: { onChange, onBlur, value } }) => (
+                                    <TextInput on editable={false}
+                                        selectTextOnFocus={false}
+                                        placeholder={'Birthday'}
+                                        onChangeText={onChange}
+                                        // value={value}
+                                        defaultValue={format(date, 'dd-MM-yyyy')}
+                                        style={{
+                                            fontSize: 16,
+                                        }} />
+                                )}
+                                name="date"
+                            ></Controller>
+
                         </TouchableOpacity>
                         <DatePicker
                             modal
@@ -185,13 +262,18 @@ export default function RegisterScreen({ navigation }) {
                             }}
                         />
                     </View>
+                    {errors.date && <Text style={styles.textError}>{errors.date.message}</Text>}
+
 
                     <View style={{
                         alignItems: 'center',
                         marginTop: 30
                     }}>
                         <TouchableOpacity onPress={
-                            console.log('date', date)
+
+                            handleSubmit(onSubmit)
+                            // console.log(date)
+
                         }
                             style={{
                                 marginTop: 20,
@@ -224,3 +306,26 @@ export default function RegisterScreen({ navigation }) {
         </SafeAreaView>
     )
 }
+const styles = StyleSheet.create({
+    viewStyle: {
+        color: 'black',
+        marginTop: 20,
+        borderRadius: 20,
+        paddingLeft: 10,
+        backgroundColor: "#DDDDDD",
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    textInput: {
+        fontSize: 16,
+        width: '80%',
+        height: 60,
+    },
+    textError: {
+        color: 'red'
+    },
+    borderError: {
+        borderWidth: 1,
+        borderColor: 'red'
+    }
+})

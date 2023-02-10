@@ -1,8 +1,23 @@
 import React from 'react'
 import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
-import PushScreen from '../Init/PushScreen'
+// import CallAPI from './CallAPI'
 import { useNavigation } from '@react-navigation/native'
+import axios, { isCancel, AxiosError } from 'axios';
+
 export default ProdustItem = (props) => {
+    const urlAPI = 'https://63e5c253c8839ccc284b255a.mockapi.io/product/product'
+
+    const DeleteItem = async (id) => {
+        const deleteItem = await axios.delete(urlAPI + '/' + id)
+
+        if (deleteItem.status === 200) {
+            console.log('Xoa OK')
+
+        } else {
+            console.log('Xoa Loi')
+
+        }
+    }
     const navigation = useNavigation();
     return (
         <View style={{
@@ -67,12 +82,15 @@ export default ProdustItem = (props) => {
                     Description: {props.item.description}
                 </Text> */}
 
-                <View>
+                <View style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-evenly'
+                }}>
                     <TouchableOpacity onPress={() => navigation.navigate('DetailItem', { item: props.item })
                     }
                         style={{
                             marginTop: 20,
-                            width: '100%', height: 60,
+                            width: '40%', height: 60,
                             backgroundColor: 'orange',
                             justifyContent: 'center',
                             alignItems: 'center',
@@ -85,11 +103,33 @@ export default ProdustItem = (props) => {
                             fontSize: 16,
                         }}>DETAIL</Text>
                     </TouchableOpacity>
+                    <TouchableOpacity onPress={
+                        () => {
+                            console.log("ID", props.item.id)
+                            DeleteItem(props.item.id)
+                        }
+                    }
+                        style={{
+                            marginTop: 20,
+                            width: '40%', height: 60,
+                            backgroundColor: 'orange',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            borderRadius: 20,
+
+                        }}>
+                        <Text style={{
+                            color: 'white',
+                            fontWeight: '700',
+                            fontSize: 16,
+                        }}>DELETE</Text>
+                    </TouchableOpacity>
                 </View>
             </View>
         </View >
     )
 }
+
 // const styles = StyleSheet.create(
 //     {
 //         title: {

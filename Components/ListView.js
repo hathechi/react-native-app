@@ -4,10 +4,9 @@ import ProductItem from './ProductItem'
 
 
 export default ListView = ({ data }) => {
-    console.log("viwq", data.length)
+
     return (
         <View>
-
             <FlatList data={data}
                 renderItem={({ item }) => {
                     return (

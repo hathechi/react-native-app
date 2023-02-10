@@ -13,24 +13,83 @@ import {
   ImageBackground,
   useColorScheme,
   View,
+  Alert
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from "yup";
+
+import { initializeApp } from "firebase/app";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { firebaseConfig } from "../config_firebase";
 
 
 
 function LoginScreen({ navigation }) {
-  const [user, setUser] = useState('')
-  const [pass, setPass] = useState('')
+  const [isLogin, setIsLogin] = useState(true)
+  const app = initializeApp(firebaseConfig)
+  const auth = getAuth(app)
+  //FireBase
+  const handleSignInAuth = async (email, password) => {
+    await signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Signed in 
+        const user = userCredential.user;
+        // console.log("firebase", user.email)
+        if (user != null) {
+
+          // Alert.alert('Login Successful')
+          console.log("userName", auth.currentUser.email)
+          setIsLogin(true)
+
+          //Chuyển màn khi đăng nhập thành công
+          { navigation.replace('HomeScreen') }
+        }
+
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(errorMessage, errorCode)
+        Alert.alert('Password or Email Incorrect')
+        setIsLogin(false)
+
+      });
+  }
+
   const [isShowPass, setIsShowPass] = useState(true)
 
-  return (
-    <SafeAreaView>
-      <ScrollView>
-        <View style={{ backgroundColor: 'white', height: 1000 }}>
+  const schema = yup.object({
+    email: yup.string().email().required(),
+    pass: yup.number().positive().required()
 
+  }).required();
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      email: '',
+      pass: '',
+
+    },
+    resolver: yupResolver(schema)
+
+  });
+  const onSubmit = (data) => {
+    console.log("DATA : ", data);
+    handleSignInAuth(data.email, data.pass)
+  }
+
+  return (
+    <SafeAreaView style={{ backgroundColor: 'white', height: '100%' }}>
+      <ScrollView>
+        <View >
           <Image style={{ width: '100%', height: 300 }}
             source={require('../assets/images/login.png')}></Image>
-
           <View >
             <View style={{ marginEnd: 34, marginStart: 34, }}>
               <Text style={{ color: 'black', fontSize: 34, fontWeight: '600' }}>
@@ -38,43 +97,42 @@ function LoginScreen({ navigation }) {
               </Text>
             </View>
             <View style={{ marginStart: 20, marginEnd: 20 }}>
-              <View style={{
-                color: 'black',
-                marginTop: 30,
-                borderRadius: 20,
-                paddingLeft: 10,
-                backgroundColor: "#DDDDDD",
-                flexDirection: 'row',
-                alignItems: 'center'
-              }}>
-                <Icon name='user' size={22} style={{
+              <View style={[styles.viewStyle, errors.email && styles.borderError,
+              isLogin == false && styles.borderError]}>
+                <Icon name='envelope' size={20} style={{
                   marginLeft: 20,
                   marginEnd: 10,
                 }} />
-                <TextInput placeholder='User' onChangeText={setUser} value={user} style={{
-                  fontSize: 16,
-                  width: '80%',
-                  height: 60,
-                }}></TextInput>
+                <Controller
+                  control={control}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput
+                      keyboardType={'email-address'}
+                      placeholder='Email'
+                      onChangeText={onChange} value={value}
+                      style={styles.textInput}></TextInput>
+                  )}
+                  name="email"
+                ></Controller>
               </View>
-              <View style={{
-                color: 'black',
-                marginTop: 30,
-                borderRadius: 20,
-                paddingLeft: 10,
-                backgroundColor: "#DDDDDD",
-                flexDirection: 'row',
-                alignItems: 'center'
-              }}>
-                <Icon name='lock' size={22} style={{
+              {errors.email && <Text style={styles.textError}>{errors.email.message}</Text>}
+              <View style={[styles.viewStyle, errors.pass && styles.borderError,
+              isLogin == false && styles.borderError]}>
+                <Icon name='lock' size={24} style={{
                   marginLeft: 20,
                   marginEnd: 10,
                 }} />
-                <TextInput placeholder='Password' secureTextEntry={isShowPass} onChangeText={setPass} value={pass} style={{
-                  fontSize: 16,
-                  width: '80%',
-                  height: 60,
-                }}></TextInput>
+                <Controller
+                  control={control}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <TextInput maxLength={6}
+                      keyboardType={'number-pad'}
+                      placeholder='Password' secureTextEntry={isShowPass}
+                      onChangeText={onChange} value={value}
+                      style={styles.textInput}></TextInput>
+                  )}
+                  name="pass"
+                ></Controller>
                 <TouchableOpacity onPress={() => setIsShowPass(!isShowPass)}>
                   {isShowPass ? <Icon name='eye-slash' size={22} style={{
                     marginRight: 20,
@@ -83,11 +141,14 @@ function LoginScreen({ navigation }) {
                   }} />}
                 </TouchableOpacity>
               </View>
+              {errors.pass && <Text style={styles.textError}>{errors.pass.message}</Text>}
               <View style={{
                 alignItems: 'center',
                 marginTop: 30
               }}>
-                <TouchableOpacity onPress={() => navigation.navigate('HomeScreen')
+                <TouchableOpacity onPress={
+                  // () => navigation.navigate('HomeScreen')
+                  handleSubmit(onSubmit)
                 }
                   style={{
                     marginTop: 20,
@@ -151,5 +212,28 @@ function LoginScreen({ navigation }) {
     </SafeAreaView>
   );
 };
+const styles = StyleSheet.create({
+  viewStyle: {
+    color: 'black',
+    marginTop: 20,
+    borderRadius: 20,
+    paddingLeft: 10,
+    backgroundColor: "#DDDDDD",
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  textInput: {
+    fontSize: 16,
+    width: '80%',
+    height: 60,
+  },
+  textError: {
+    color: 'red'
+  },
+  borderError: {
+    borderWidth: 1,
+    borderColor: 'red'
+  }
+})
 
 export default LoginScreen;
