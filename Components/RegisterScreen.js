@@ -74,10 +74,10 @@ export default function RegisterScreen({ navigation }) {
                 console.log("firebase", user.email)
                 if (user != null) {
 
-                    Alert.alert('Register Successful')
                     console.log("userName", auth.currentUser.email)
                     //Chuyển màn khi đăng kí thành công
-                    // { navigation.navigate('HomeScreen') }
+                    { navigation.replace('LoginScreen') }
+                    Alert.alert('Register Successful')
                 }
 
             })

@@ -12,6 +12,8 @@ import DetailItem from './Components/DetailItem';
 import CallAPI from './Components/CallAPI';
 import CreateProduct from './Components/CreateProduct'
 import RegisterScreen from './Components/RegisterScreen';
+import SettingUser from './Components/SettingUser';
+import CRUDScreen from './Components/CRUDScreen';
 
 // import { initializeApp } from "firebase/app";
 // import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
@@ -22,27 +24,28 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 export default function App() {
 
-    // const app = initializeApp(firebaseConfig)
-    // const auth = getAuth(app)
-    // const isLogin = () => {
-    //     console.log("userLogin", auth.currentUser.email)
-    // }
 
     return (
         <NavigationContainer>
-            <Stack.Navigator
-            >
+            <Stack.Navigator>
                 <Stack.Screen
                     name="HomeScreen"
                     component={HomeScreen}
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen
+                    name="CreateProduct"
+                    component={CreateProduct}
+                    options={{
+                        headerTitleAlign: 'center'
+                    }}
+                />
+
+                <Stack.Screen
                     name="LoginScreen"
                     component={LoginScreen}
                     options={{ headerShown: false }}
                 />
-
                 <Stack.Screen
                     name="RegisterScreen"
                     component={RegisterScreen}
@@ -56,6 +59,17 @@ export default function App() {
                 <Stack.Screen
                     name="DetailItem"
                     component={DetailItem}
+                    options={{ headerShown: false }} //ẩn thanh bar
+
+                />
+                <Stack.Screen
+                    name="CRUDScreen"
+                    component={CRUDScreen}
+                />
+
+                <Stack.Screen
+                    name="SettingUser"
+                    component={SettingUser}
                 />
                 <Stack.Screen
                     name="Lab2"

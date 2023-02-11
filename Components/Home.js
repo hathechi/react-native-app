@@ -6,8 +6,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import SettingUser from './SettingUser';
 import CallAPI from './CallAPI';
 import CreateProduct from './CreateProduct'
-// import AnimatedTabBar from '@gorhom/animated-tabbar';
-
+import CRUDScreen from './CRUDScreen';
 const Tab = createBottomTabNavigator();
 // const tabs = {
 //     Home: { // < Screen name
@@ -46,18 +45,19 @@ function HomeScreen() {
     return (
         // <NavigationContainer>
         <Tab.Navigator
-            // tabBar={props => (
-            //     <AnimatedTabBar tabs={tabs} {...props} />
-            // )}
-            screenOptions={{
-                headerShown: false
-            }}
+        // tabBar={props => (
+        //     <AnimatedTabBar tabs={tabs} {...props} />
+        // )}
+        // screenOptions={{
+        //     headerShown: false
+        // }}
 
         >
 
             <Tab.Screen name="Home" component={CallAPI}
                 options={{
                     tabBarShowLabel: false,
+                    headerShown: false,
 
                     tabBarIcon: ({ color }) => (
                         <Icon name="home" size={32} color={color} />
@@ -67,11 +67,14 @@ function HomeScreen() {
 
                 }} />
 
-            <Tab.Screen name="CreateProduct" component={CreateProduct}
+            <Tab.Screen name="CRUDScreen" component={CRUDScreen}
 
                 options={{
                     tabBarShowLabel: false,
 
+                    headerTitleAlign: 'center',
+                    title: 'Products',
+                    tabBarHideOnKeyboard: true,
                     tabBarIcon: ({ color }) => (
                         <Icon name="plus" size={32} color={color} />
                     ),
@@ -82,6 +85,9 @@ function HomeScreen() {
 
                 options={{
                     tabBarShowLabel: false,
+                    headerTitleAlign: 'center',
+                    title: 'Profile',
+                    tabBarHideOnKeyboard: true,
                     tabBarIcon: ({ color }) => (
                         <Icon name="user" size={32} color={color} />
                     ),

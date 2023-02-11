@@ -13,8 +13,9 @@ import {
     ImageBackground,
     useColorScheme,
     View,
+    FlatList,
 } from 'react-native';
-import React from 'react';
+import { React, useContext } from 'react';
 import { Picker } from '@react-native-picker/picker';
 import { useState, useEffect } from 'react';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
@@ -22,62 +23,88 @@ import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 import axios, { isCancel, AxiosError } from 'axios';
+import { callFetchPost } from '../context';
 
 
-function CreateProduct() {
-    const listCategory = [
-        'Apple',
-        'SamSung',
-        'Xiaomi',
-        'Huawei'
+function CreateProduct({ navigation }) {
+    const listRateting = [
+        '1',
+        '2',
+        '3',
+        '4',
+        '5'
     ]
-    // const [title, setTitle] = useState('');
-    // const [price, setPrice] = useState('');
-    // const [description, setDescription] = useState('');
-    // const [category, setCategory] = useState(listCategory[0]);
-
-    const [filePath, setFilePath] = useState('');
-    const chooseFile = () => {
-        let options = {
-            title: 'Select Image',
-            customButtons: [
-                {
-                    name: 'customOptionKey',
-                    title: 'Choose Photo from Custom Option'
-                },
-            ],
-            storageOptions: {
-                skipBackup: true,
-                path: 'images',
-            },
+    // const [filePath, setFilePath] = useState([]);
+    const [filePathArray, setFilePathArray] = useState([]);
+    const chooseFile = (type) => {
+        let options =
+        {
+            mediaType: type,
+            maxWidth: 300,
+            maxHeight: 550,
+            quality: 30,
+            selectionLimit: 5
         };
         launchImageLibrary(options, (response) => {
-            console.log('Response = ', response);
+
             if (response.didCancel) {
                 console.log('User cancelled image picker');
             } else if (response.error) {
                 console.log('ImagePicker Error: ', response.error);
-            } else if (response.customButton) {
-                console.log(
-                    'User tapped custom button: ',
-                    response.customButton
-                );
-                alert(response.customButton);
             } else {
-                let source = response;
+                if (filePathArray.length > 0) {
+                    setFilePathArray([])
+                }
+                response.assets.forEach(function (item, index) {
+                    setFilePathArray(filePathArray => [...filePathArray, item.uri]);
+                });
+                console.log("xxx", filePathArray)
+            };
+        })
+    };
+    // const chooseFile = () => {
+    //     let options = {
+    //         title: 'Select Image',
+    //         customButtons: [
+    //             {
+    //                 name: 'customOptionKey',
+    //                 title: 'Choose Photo from Custom Option'
+    //             },
+    //         ],
+    //         storageOptions: {
+    //             skipBackup: true,
+    //             path: 'images',
+    //         },
+    //     };
+    //     launchImageLibrary(options, (response) => {
+    //         console.log('Response = ', response);
+    //         if (response.didCancel) {
+    //             console.log('User cancelled image picker');
+    //         } else if (response.error) {
+    //             console.log('ImagePicker Error: ', response.error);
+    //         } else if (response.customButton) {
+    //             console.log(
+    //                 'User tapped custom button: ',
+    //                 response.customButton
+    //             );
+    //             alert(response.customButton);
+    //         } else {
+    //             let source = response;
 
-                setFilePath(source.assets[0].uri);
-                // console.log(source.assets[0].uri)
-            }
-        });
-    }
+    //             setFilePath(source.assets[0].uri);
+    //             // console.log(source.assets[0].uri)
+    //         }
+    //     });
+    // }
 
     const schema = yup.object({
         title: yup.string().required(),
         description: yup.string().required(),
-        image: yup.string(),
-        category: yup.string().required(),
+        image: yup.array(),
+        rateting: yup.string(),
+        address: yup.string().required(),
         price: yup.number().positive().integer().required(),
+        phone: yup.number().positive().integer().required(),
     }).required();
 
     const {
@@ -87,10 +114,12 @@ function CreateProduct() {
     } = useForm({
         defaultValues: {
             title: '',
-            price: '',
+            price: 0,
             description: '',
-            category: listCategory[0],
-            image: ''
+            address: '',
+            image: [],
+            phone: '',
+            rateting: listRateting[0]
         },
         resolver: yupResolver(schema)
 
@@ -98,22 +127,37 @@ function CreateProduct() {
 
     // const onSubmit = (data) => console.log("DATA  ", data);
 
-    const urlAPI = 'https://61a5e3c48395690017be8ed2.mockapi.io/blogs/products'
+    const urlAPI = 'https://63e5c253c8839ccc284b255a.mockapi.io/product/product'
+
+    // const urlAPI = 'https://61a5e3c48395690017be8ed2.mockapi.io/blogs/products'
 
     // const deleteItem = async (id) => {
     //     await axios.delete(urlAPI + "/" + id)
     // }
 
-    const onSubmit = async (data) => {
+    // const fetchPost = useContext(callFetchPost)
+    // console.log("context test ", fetchPost)
 
-        data.image = filePath
-        console.log("image  ", data)
-        const res = await axios.post(urlAPI, data)
-        if (res.status === 201) {
-            console.log("ok")
+
+    const onSubmit = async (data) => {
+        if (filePathArray.length == 0) {
+            Alert.alert('image not selected yet')
         } else {
-            console.log("Lỗi")
+            data.image = filePathArray
+            console.log("data  ", data)
+            //Post API
+            const res = await axios.post(urlAPI, data)
+
+            if (res.status === 201) {
+                console.log("post ok")
+                navigation.replace('HomeScreen')
+                // navigation.pop()
+                Alert.alert("Post Success")
+            } else {
+                console.log("Lỗi")
+            }
         }
+
     }
 
 
@@ -167,12 +211,12 @@ function CreateProduct() {
     //     }
     // }
 
+
     return (
-        <ScrollView>
+        <ScrollView style={{ width: '100%', backgroundColor: 'white' }}>
             <View style={{ alignItems: 'center', margin: 30 }}>
                 <Controller
                     control={control}
-
                     render={({ field: { onChange, onBlur, value } }) => (
                         <TextInput placeholder='Title'
                             onChangeText={onChange}
@@ -187,13 +231,27 @@ function CreateProduct() {
 
                     render={({ field: { onChange, onBlur, value } }) => (
                         <TextInput keyboardType='number-pad'
-                            placeholder='Price'
+                            placeholder='Price /Day'
+                            maxLength={6}
                             onChangeText={onChange}
                             value={value} style={[styles.input, errors.price && styles.borderInputError]}></TextInput>
                     )}
                     name="price"
                 ></Controller>
                 {errors.price && <Text style={styles.textError}>{errors.price.message}</Text>}
+                <Controller
+                    control={control}
+
+                    render={({ field: { onChange, onBlur, value } }) => (
+                        <TextInput keyboardType='number-pad'
+                            placeholder='Phone Number'
+                            maxLength={10}
+                            onChangeText={onChange}
+                            value={value} style={[styles.input, errors.phone && styles.borderInputError]}></TextInput>
+                    )}
+                    name="phone"
+                ></Controller>
+                {errors.phone && <Text style={styles.textError}>{errors.phone.message}</Text>}
 
                 <Controller
                     control={control}
@@ -208,6 +266,19 @@ function CreateProduct() {
                     name="description"
                 ></Controller>
                 {errors.description && <Text style={styles.textError}>{errors.description.message}</Text>}
+                <Controller
+                    control={control}
+
+                    render={({ field: { onChange, onBlur, value } }) => (
+                        <TextInput placeholder='Address'
+                            onChangeText={onChange}
+                            value={value} style={[styles.input, errors.address && styles.borderInputError]}>
+
+                        </TextInput>
+                    )}
+                    name="address"
+                ></Controller>
+                {errors.description && <Text style={styles.textError}>{errors.address.message}</Text>}
 
                 <View style={{
                     height: 60,
@@ -222,7 +293,7 @@ function CreateProduct() {
                         render={({ field: { onChange, onBlur, value } }) => (
                             <Picker selectedValue={value}
                                 onValueChange={onChange}>
-                                {listCategory.map((item) => {
+                                {listRateting.map((item) => {
                                     return (
                                         <Picker.Item key={item} label={item} value={item} />
                                     )
@@ -230,9 +301,9 @@ function CreateProduct() {
                                 )}
                             </Picker>
                         )}
-                        name="category"
+                        name="rateting"
                     ></Controller>
-                    {errors.category && <Text style={styles.textError}>{errors.category.message}</Text>}
+                    {errors.rateting && <Text style={styles.textError}>{errors.rateting.message}</Text>}
 
                 </View>
                 <TouchableOpacity style={{
@@ -242,7 +313,10 @@ function CreateProduct() {
                     justifyContent: 'center',
                     alignItems: 'center',
                     borderRadius: 20
-                }} onPress={chooseFile}>
+                }} onPress={() => {
+                    chooseFile('photo')
+
+                }}>
                     <Text>
                         CHOICE IMAGE
                     </Text>
@@ -250,10 +324,25 @@ function CreateProduct() {
 
                 {errors.image && <Text style={styles.textError}>{errors.image.message}</Text>}
 
-                {filePath != '' ? <Image style={{
-                    width: '100%',
-                    height: 300,
-                }} source={{ uri: filePath }}></Image> : null}
+                {/* {filePathArray != '' ? filePathArray.map((item, i) => {
+                    return <Image key={i} style={{
+                        width: 300,
+                        height: 200,
+                        margin: 10
+                    }} source={{ uri: item }}></Image>
+                }) : null} */}
+
+                {filePathArray != '' ? <FlatList
+                    horizontal
+                    data={filePathArray}
+                    renderItem={({ item }) => {
+                        return <Image style={{
+                            width: 300,
+                            height: 200,
+                            margin: 10
+                        }} source={{ uri: item }}></Image>
+                    }}
+                /> : null}
 
                 <TouchableOpacity
                     onPress={
@@ -269,6 +358,7 @@ function CreateProduct() {
                     }}>
                     <Text>POST</Text>
                 </TouchableOpacity>
+
 
             </View >
         </ScrollView>

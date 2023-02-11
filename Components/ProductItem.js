@@ -1,10 +1,15 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { View, Text, Image, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
 // import CallAPI from './CallAPI'
 import { useNavigation } from '@react-navigation/native'
 import axios, { isCancel, AxiosError } from 'axios';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import { Rating, AirbnbRating } from 'react-native-ratings';
+import { DataContext } from '../context';
 
-export default ProdustItem = (props) => {
+
+
+export default ProductItem = (props) => {
     const urlAPI = 'https://63e5c253c8839ccc284b255a.mockapi.io/product/product'
 
     const DeleteItem = async (id) => {
@@ -12,6 +17,7 @@ export default ProdustItem = (props) => {
 
         if (deleteItem.status === 200) {
             console.log('Xoa OK')
+            // Alert.alert("Delete Success")
 
         } else {
             console.log('Xoa Loi')
@@ -19,114 +25,99 @@ export default ProdustItem = (props) => {
         }
     }
     const navigation = useNavigation();
+
+    // const value = useContext(DataContext)
+    // console.log("context test ", value)
+
     return (
-        <View style={{
-            margin: 10,
-            padding: 15,
-            backgroundColor: "#dfe2e8",
-            flex: 1,
-            borderRadius: 10
-        }}>
-            <Image style={{
-                width: '100%',
-                height: 300,
-                borderRadius: 15,
-            }} source={{ uri: props.item.image }} />
-            <View style={{
-                marginVertical: 20
-            }}>
-                <Text style={{
-                    fontSize: 20,
-                    color: 'black',
-                    fontWeight: '700'
+        <TouchableOpacity onPress={() => navigation.navigate('DetailItem', { item: props.item })}>
+            <View
+                elevation={5}
+                style={{
+                    margin: 10,
+                    padding: 20,
+                    borderRadius: 10,
+                    shadowColor: "#bdbbbb",
+                    shadowOpacity: 0.8,
+                    shadowRadius: 20,
+                    shadowOffset: {
+                        height: 5,
+                        width: 5
+                    }
                 }}>
-                    Title: {props.item.title}
-                </Text>
+                <Image style={{
+                    width: '100%',
+                    height: 150,
+                    borderRadius: 5,
+                }} source={{ uri: props.item.image[0] }}>
+                </Image>
                 <View style={{
-                    flexDirection: 'row',
-                    marginTop: 10,
-                    justifyContent: 'space-around'
+                    marginVertical: 10
                 }}>
                     <View style={{
-                        padding: 10,
-                        backgroundColor: "#f0f2f2",
-                        borderRadius: 10,
-                        marginEnd: 20
+
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+
                     }}>
-                        <Text style={{
-                            marginEnd: 10,
-                            fontSize: 16,
-                            color: '#f72346'
+                        <View style={{
+                            width: '65%',
+
                         }}>
-                            Price: {props.item.price} $
-                        </Text>
+                            <View style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+
+                            }}>
+                                <Icon style={{ marginEnd: 10 }} name='hotel' color={'black'} size={18} />
+                                <Text style={{
+                                    fontFamily: 'comfortaa',
+                                    fontSize: 18,
+                                    color: 'black',
+                                }}>
+                                    {props.item.title}
+                                </Text>
+                            </View>
+                            <View style={{
+                                flexDirection: 'row',
+                                alignItems: 'center'
+                            }}>
+                                <Icon style={{ marginEnd: 18 }} name='location-arrow' color={'black'} size={18} />
+                                <Text style={{
+                                    fontFamily: 'comfortaa',
+                                }}>
+                                    {props.item.address}
+                                </Text>
+                            </View>
+                            <View style={{
+                                flexDirection: 'row',
+                                alignItems: 'center'
+                            }}>
+                                <Icon style={{ marginEnd: 22 }} name='dollar' color={'black'} size={18} />
+                                <Text style={{
+                                    fontFamily: 'comfortaa',
+                                    color: 'black',
+                                }}>
+                                    {props.item.price + '$/day'}
+                                </Text>
+                            </View>
+                        </View>
+                        <View style={{
+                            justifyContent: 'flex-start',
+                            marginTop: 10,
+
+                        }}>
+                            <AirbnbRating
+                                count={5}
+                                defaultRating={props.item.rateting}
+                                size={16}
+                                showRating={false}
+                            />
+                        </View>
                     </View>
-                    <View style={{
-                        padding: 10,
-                        backgroundColor: "#f0f2f2",
-                        borderRadius: 10,
-                    }}>
-                        <Text style={{
-                            color: '#f72346',
-                            fontSize: 16,
-                        }} >
-                            Quantity: {props.item.quantity}
-                        </Text>
-                    </View>
-
-                </View>
-                {/* <Text style={{
-                    fontSize: 14,
-                    marginTop: 10
-                }}>
-                    Description: {props.item.description}
-                </Text> */}
-
-                <View style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-evenly'
-                }}>
-                    <TouchableOpacity onPress={() => navigation.navigate('DetailItem', { item: props.item })
-                    }
-                        style={{
-                            marginTop: 20,
-                            width: '40%', height: 60,
-                            backgroundColor: 'orange',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            borderRadius: 20,
-
-                        }}>
-                        <Text style={{
-                            color: 'white',
-                            fontWeight: '700',
-                            fontSize: 16,
-                        }}>DETAIL</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={
-                        () => {
-                            console.log("ID", props.item.id)
-                            DeleteItem(props.item.id)
-                        }
-                    }
-                        style={{
-                            marginTop: 20,
-                            width: '40%', height: 60,
-                            backgroundColor: 'orange',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            borderRadius: 20,
-
-                        }}>
-                        <Text style={{
-                            color: 'white',
-                            fontWeight: '700',
-                            fontSize: 16,
-                        }}>DELETE</Text>
-                    </TouchableOpacity>
                 </View>
             </View>
-        </View >
+        </TouchableOpacity>
     )
 }
 
