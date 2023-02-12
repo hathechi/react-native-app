@@ -5,10 +5,10 @@ import { compareAsc, format } from 'date-fns'
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
-
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { firebaseConfig } from "../config_firebase";
+import Loading from './Loading';
 import {
     SafeAreaView,
     ScrollView,
@@ -24,10 +24,10 @@ import {
     View,
     Alert,
 } from 'react-native';
-import { da } from 'date-fns/locale';
 
 
 export default function RegisterScreen({ navigation }) {
+    const [isLoading, setIsLoading] = useState(false)
     const app = initializeApp(firebaseConfig)
     const auth = getAuth(app)
 
@@ -56,11 +56,6 @@ export default function RegisterScreen({ navigation }) {
 
     });
 
-
-    // const [user, setUser] = useState('')
-    // const [pass, setPass] = useState('')
-    // const [cfpass, setCfPass] = useState('')
-    // const [email, setEmail] = useState('')
     const [date, setDate] = useState(new Date())
     const [isShowPass, setIsShowPass] = useState(true)
     //open datePicker
@@ -72,11 +67,13 @@ export default function RegisterScreen({ navigation }) {
                 // Signed in 
                 const user = userCredential.user;
                 console.log("firebase", user.email)
+
                 if (user != null) {
 
+                    setIsLoading(false)
                     console.log("userName", auth.currentUser.email)
                     //Chuyển màn khi đăng kí thành công
-                    { navigation.replace('LoginScreen') }
+                    navigation.replace('LoginScreen')
                     Alert.alert('Register Successful')
                 }
 
@@ -84,6 +81,8 @@ export default function RegisterScreen({ navigation }) {
             .catch((error) => {
                 const errorCode = error.code;
                 const errorMessage = error.message;
+                Alert.alert(errorMessage)
+                setIsLoading(false)
                 console.log(errorMessage, errorCode)
             });
     }
@@ -94,13 +93,16 @@ export default function RegisterScreen({ navigation }) {
         if (data.pass != data.cfpass) {
             Alert.alert('two passwords must be the same')
         } else {
+            setIsLoading(true)
             handleSignUpAuth(data.email, data.pass)
             console.log("DATA : ", data.email, data.pass);
 
         }
 
     }
-
+    if (isLoading) {
+        return <Loading />
+    }
     return (
         <SafeAreaView style={{
             backgroundColor: 'white',
@@ -289,7 +291,7 @@ export default function RegisterScreen({ navigation }) {
                                 color: 'black'
                             }}>SIGN IN</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => navigation.navigate('LoginScreen')}>
+                        <TouchableOpacity onPress={() => navigation.replace('LoginScreen')}>
                             <Text style={{
                                 fontSize: 16,
                                 color: '#0b7dd4',

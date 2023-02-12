@@ -9,7 +9,10 @@ import { DataContext } from '../context';
 
 
 
+
 export default ProductItem = (props) => {
+
+
     const urlAPI = 'https://63e5c253c8839ccc284b255a.mockapi.io/product/product'
 
     const DeleteItem = async (id) => {
@@ -29,8 +32,14 @@ export default ProductItem = (props) => {
     // const value = useContext(DataContext)
     // console.log("context test ", value)
 
+
+
     return (
+
+
         <TouchableOpacity onPress={() => navigation.navigate('DetailItem', { item: props.item })}>
+
+
             <View
                 elevation={5}
                 style={{
@@ -117,7 +126,11 @@ export default ProductItem = (props) => {
                     </View>
                 </View>
             </View>
+
         </TouchableOpacity>
+
+
+
     )
 }
 

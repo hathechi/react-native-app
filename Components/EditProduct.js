@@ -24,11 +24,9 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 import axios, { isCancel, AxiosError } from 'axios';
 import Loading from './Loading';
-
-
-function CreateProduct({ navigation }) {
+const EditProduct = ({ route, navigation }) => {
     const [isLoading, setIsLoading] = useState(false)
-
+    const { itemEdit } = route.params;
     const listRateting = [
         '1',
         '2',
@@ -64,41 +62,6 @@ function CreateProduct({ navigation }) {
             };
         })
     };
-    // const chooseFile = () => {
-    //     let options = {
-    //         title: 'Select Image',
-    //         customButtons: [
-    //             {
-    //                 name: 'customOptionKey',
-    //                 title: 'Choose Photo from Custom Option'
-    //             },
-    //         ],
-    //         storageOptions: {
-    //             skipBackup: true,
-    //             path: 'images',
-    //         },
-    //     };
-    //     launchImageLibrary(options, (response) => {
-    //         console.log('Response = ', response);
-    //         if (response.didCancel) {
-    //             console.log('User cancelled image picker');
-    //         } else if (response.error) {
-    //             console.log('ImagePicker Error: ', response.error);
-    //         } else if (response.customButton) {
-    //             console.log(
-    //                 'User tapped custom button: ',
-    //                 response.customButton
-    //             );
-    //             alert(response.customButton);
-    //         } else {
-    //             let source = response;
-
-    //             setFilePath(source.assets[0].uri);
-    //             // console.log(source.assets[0].uri)
-    //         }
-    //     });
-    // }
-
     const schema = yup.object({
         title: yup.string().required(),
         description: yup.string().required(),
@@ -127,19 +90,10 @@ function CreateProduct({ navigation }) {
 
     });
 
-    // const onSubmit = (data) => console.log("DATA  ", data);
+
 
     const urlAPI = 'https://63e5c253c8839ccc284b255a.mockapi.io/product/product'
-
-    // const urlAPI = 'https://61a5e3c48395690017be8ed2.mockapi.io/blogs/products'
-
-    // const deleteItem = async (id) => {
-    //     await axios.delete(urlAPI + "/" + id)
-    // }
-
-    // const fetchPost = useContext(callFetchPost)
-    // console.log("context test ", fetchPost)
-
+    console.log("ID  ", itemEdit.id)
 
     const onSubmit = async (data) => {
         if (filePathArray.length == 0) {
@@ -147,77 +101,25 @@ function CreateProduct({ navigation }) {
         } else {
             data.image = filePathArray
             console.log("data  ", data)
+            //Edit API
             setIsLoading(true)
-            //Post API
-            const res = await axios.post(urlAPI, data)
+            const res = await axios.put(urlAPI + '/' + itemEdit.id, data)
 
-            if (res.status === 201) {
-                console.log("post ok")
+            if (res.status === 200) {
+                console.log("edit ok")
                 navigation.replace('HomeScreen')
                 // navigation.pop()
-                Alert.alert("Post Success")
                 setIsLoading(false)
 
+                Alert.alert("Edit Success")
             } else {
                 console.log("Lỗi")
-                Alert.alert("Post Error")
+                Alert.alert("Edit Error")
 
             }
         }
 
     }
-
-
-    // let checkValidation = false
-    // function Validation(ten, tuoi, chuyennganh) {
-    //     // let tenformat = /[a-z A-Z ]/g;
-    //     let tenformat = /^[a-zA-Z]+(([\'\,\.\-_ \/)(:][a-zA-Z_ ])?[a-zA-Z_ .]*)*$/
-    //     let emailFormat = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-    //     if (ten == '' && tuoi == '' && chuyennganh == '' && email == '') {
-    //         setError({
-    //             ten: "Không được để trống!",
-    //             tuoi: "Không được để trống!",
-    //             chuyennganh: "Không được để trống!",
-    //             email: 'Không được để trống!'
-    //         })
-    //     } else if (ten == '') {
-    //         setError({ ten: "Không được để trống!", })
-    //     } else if (tuoi == '') {
-    //         setError({ tuoi: "Không được để trống!", })
-    //     } else if (chuyennganh == '') {
-    //         setError({ chuyennganh: "Không được để trống!", })
-    //     }
-    //     else if (!ten.match(tenformat)) {
-    //         setError({
-    //             ten: "không được chứa số và kí tự đặc biệt!",
-    //             tuoi: "",
-    //             chuyennganh: ""
-    //         })
-    //     }
-    //     else if (!chuyennganh.match(tenformat)) {
-    //         setError({
-    //             ten: "",
-    //             tuoi: "",
-    //             chuyennganh: "không được chứa số và kí tự đặc biệt!"
-    //         })
-    //     }
-    //     else if (!email.match(emailFormat)) {
-    //         setError({
-    //             ten: "",
-    //             tuoi: "",
-    //             chuyennganh: "Nhập đúng định dạng email!"
-    //         })
-    //     }
-    //     else {
-    //         setError({
-    //             ten: "",
-    //             tuoi: "",
-    //             chuyennganh: ""
-    //         })
-    //         return checkValidation = !checkValidation
-    //     }
-    // }
-
     if (isLoading) {
         return <Loading />
     }
@@ -365,7 +267,7 @@ function CreateProduct({ navigation }) {
                         alignItems: 'center',
                         borderRadius: 20
                     }}>
-                    <Text>POST</Text>
+                    <Text>EDIT</Text>
                 </TouchableOpacity>
 
 
@@ -397,4 +299,4 @@ const styles = StyleSheet.create({
         marginTop: 5,
     }
 })
-export default CreateProduct
+export default EditProduct

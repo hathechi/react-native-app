@@ -1,70 +1,73 @@
 [
   {
-    "title": "Strosin and Sons",
+    "title": "Artis Hotel",
     "image": [
-      "https://artishotel.vn/wp-content/uploads/2017/06/superior-king-bedroom.png",
-      "https://artishotel.vn/wp-content/uploads/2017/06/superior-double-room-1.png",
-      "https://artishotel.vn/wp-content/uploads/2017/06/superior-king-bedroom.png"
+      "https://artishotel.vn/wp-content/uploads/2022/06/kham-pha-artis-1.jpg",
+      "https://artishotel.vn/wp-content/uploads/2022/11/Frame-3-1.jpg",
+      "https://artishotel.vn/wp-content/uploads/2022/06/kham-pha-artis-3.jpg"
+      
     ],
-    "description": "The Apollotech B340 is an affordable wireless mouse with reliable connectivity, 12 months battery life and modern design",
-    "phone": "807.571.1199 x5942",
-    "price": "4",
-    "address": "Fountain Valley",
+    "description": "Artis Hotel có vị trí nằm ngay trung tâm thành phố Đà Lạt, mang đến sự tiện lợi khi di chuyển đến các điểm ăn uống vui chơi xung quanh. Lấy cảm hứng từ thiết kế Đông Dương cổ điển, sắc trầm cùng gam màu trắng tinh tế, Artis Hotel thể hiện vẻ đẹp vừa hiện đại vừa sang trọng giữa lòng thành phố mộng mơ.",
+    "phone": "0993939333",
+    "price": "40",
+    "address": "Dalad",
     "rateting": 3,
     "id": "9"
   },
   {
-    "title": "Auer LLC",
+    "title": "Auer Hotel",
     "image": [
+      "https://artishotel.vn/wp-content/uploads/2022/06/kham-pha-artis.jpg",
       "https://artishotel.vn/wp-content/uploads/2017/06/superior-king-bedroom.png",
-      "https://artishotel.vn/wp-content/uploads/2017/06/superior-double-room-1.png",
-      "https://artishotel.vn/wp-content/uploads/2017/06/superior-king-bedroom.png"
+      "https://artishotel.vn/wp-content/uploads/2022/06/kham-pha-artis-3.jpg"
+
     ],
     "description": "Andy shoes are designed to keeping in mind durability as well as trends, the most stylish range of shoes & sandals",
-    "phone": "1-477-611-6643 x271",
-    "price": "9",
+    "phone": "0832322233",
+    "price": "25.6",
     "address": "Deerfield Beach",
     "rateting": 3,
     "id": "10"
   },
   {
-    "title": "Berge Inc",
+    "title": "Berge Inc Hotel",
     "image": [
-      "https://artishotel.vn/wp-content/uploads/2017/06/superior-king-bedroom.png",
-      "https://artishotel.vn/wp-content/uploads/2017/06/superior-double-room-1.png",
+      "https://artishotel.vn/wp-content/uploads/2022/11/Frame-3-1.jpg",
+      "https://artishotel.vn/wp-content/uploads/2022/06/kham-pha-artis-3.jpg",
       "https://artishotel.vn/wp-content/uploads/2017/06/superior-king-bedroom.png"
     ],
     "description": "Ergonomic executive chair upholstered in bonded black leather and PVC padded seat and back for all-day comfort and support",
-    "phone": "1-440-454-8171 x0068",
-    "price": "5",
+    "phone": "1-440-454-8171",
+    "price": "50.6",
     "address": "North Roma",
     "rateting": 4,
     "id": "11"
   },
   {
-    "title": "Pagac LLC",
+    "title": "Pagac LLC Hotel",
     "image": [
-      "https://artishotel.vn/wp-content/uploads/2017/06/superior-king-bedroom.png",
+      "https://artishotel.vn/wp-content/uploads/2022/06/kham-pha-artis-2.jpg",
       "https://artishotel.vn/wp-content/uploads/2017/06/superior-double-room-1.png",
       "https://artishotel.vn/wp-content/uploads/2017/06/superior-king-bedroom.png"
     ],
     "description": "Ergonomic executive chair upholstered in bonded black leather and PVC padded seat and back for all-day comfort and support",
-    "phone": "1-925-800-7328 x4776",
-    "price": "7",
+    "phone": "1-925-800-7328",
+    "price": "27.5",
     "address": "Haleyfurt",
     "rateting": 2,
     "id": "12"
   },
   {
-    "title": "Ortiz Group",
+    "title": "Ortiz Group Hotel",
     "image": [
-      "https://artishotel.vn/wp-content/uploads/2017/06/superior-king-bedroom.png",
-      "https://artishotel.vn/wp-content/uploads/2017/06/superior-double-room-1.png",
+      "https://artishotel.vn/wp-content/uploads/2022/11/Frame-3-1.jpg",
+      "https://artishotel.vn/wp-content/uploads/2021/12/phong-tam1.png",
+     
       "https://artishotel.vn/wp-content/uploads/2017/06/superior-king-bedroom.png"
     ],
     "description": "New range of formal shirts are designed keeping you in mind. With fits and styling that will make you stand apart",
-    "phone": "550-672-5554 x0609",
-    "price": "9",
+    "phone": "550-672-5554",
+    "price": "90.6",
     "address": "Fort Trenton",
     "rateting": 3,
     "id": "13"

@@ -21,15 +21,26 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 
 import { initializeApp } from "firebase/app";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { firebaseConfig } from "../config_firebase";
-
+import Loading from './Loading';
 
 
 function LoginScreen({ navigation }) {
   const [isLogin, setIsLogin] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
   const app = initializeApp(firebaseConfig)
   const auth = getAuth(app)
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+
+      console.log('User email: ', user.email);
+      () => navigation.navigate('HomeScreen')
+    } else {
+      // user is not logged in
+      console.log('NO LoginScreen');
+    }
+  });
   //FireBase
   const handleSignInAuth = async (email, password) => {
     await signInWithEmailAndPassword(auth, email, password)
@@ -41,7 +52,7 @@ function LoginScreen({ navigation }) {
 
           // Alert.alert('Login Successful')
           console.log("userName", auth.currentUser.email)
-          setIsLogin(true)
+          setIsLoading(false)
 
           //Chuyển màn khi đăng nhập thành công
           { navigation.replace('HomeScreen') }
@@ -52,6 +63,7 @@ function LoginScreen({ navigation }) {
         const errorCode = error.code;
         const errorMessage = error.message;
         console.log(errorMessage, errorCode)
+        setIsLoading(false)
         Alert.alert('Password or Email Incorrect')
         setIsLogin(false)
 
@@ -81,9 +93,12 @@ function LoginScreen({ navigation }) {
   });
   const onSubmit = (data) => {
     console.log("DATA : ", data);
+    setIsLoading(true)
     handleSignInAuth(data.email, data.pass)
   }
-
+  if (isLoading) {
+    return <Loading />
+  }
   return (
     <SafeAreaView style={{ backgroundColor: 'white', height: '100%' }}>
       <ScrollView>
@@ -182,7 +197,7 @@ function LoginScreen({ navigation }) {
               <Text>
                 Do not have an account?
               </Text>
-              <TouchableOpacity onPress={() => navigation.navigate('RegisterScreen')}>
+              <TouchableOpacity onPress={() => navigation.replace('RegisterScreen')}>
                 <Text style={{
                   fontSize: 16,
                   color: '#0ea0c4',

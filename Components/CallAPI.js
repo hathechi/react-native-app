@@ -6,7 +6,8 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import ListView from './ListView';
 import { DataContext } from '../context';
 import { Rating, AirbnbRating } from 'react-native-ratings';
-export default function CallAPI() {
+import Loading from './Loading';
+export default function CallAPI({ navigation }) {
     const [products, setProducts] = useState([])
     const [isLoading, setIsLoading] = useState(true)
     const [search, setSearch] = useState('')
@@ -35,9 +36,7 @@ export default function CallAPI() {
         }
     }
     if (isLoading) {
-        return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <ActivityIndicator size={'large'} />
-        </View>
+        return <Loading />
     }
     if (products.length > 0) {
         return (
@@ -144,6 +143,7 @@ export default function CallAPI() {
                                         />
                                     </View>
                                 </View>
+
                             }
                             } />
                     </View>
