@@ -15,7 +15,7 @@ import RegisterScreen from './Components/RegisterScreen';
 import SettingUser from './Components/SettingUser';
 import CRUDScreen from './Components/CRUDScreen';
 import EditProduct from './Components/EditProduct';
-
+import Maps from './Components/Maps';
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
 import { firebaseConfig } from "./config_firebase";
@@ -44,15 +44,18 @@ export default function App() {
     return (
         <NavigationContainer>
             <Stack.Navigator>
-
-                <Stack.Screen
-                    name="LoginScreen"
-                    component={LoginScreen}
-                    options={{ headerShown: false }}
-                />
                 <Stack.Screen
                     name="HomeScreen"
                     component={HomeScreen}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="Maps"
+                    component={Maps}
+                />
+                <Stack.Screen
+                    name="LoginScreen"
+                    component={LoginScreen}
                     options={{ headerShown: false }}
                 />
 

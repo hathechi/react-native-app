@@ -147,7 +147,7 @@ const CRUDScreen = ({ navigation }) => {
                                                 {item.title}
                                             </Text>
                                         </View>
-                                        <View style={{
+                                        {/* <View style={{
                                             flexDirection: 'row',
                                             alignItems: 'center'
                                         }}>
@@ -155,9 +155,9 @@ const CRUDScreen = ({ navigation }) => {
                                             <Text style={{
                                                 fontFamily: 'comfortaa',
                                             }}>
-                                                {item.address}
+                                                {item.address.location.latitude}
                                             </Text>
-                                        </View>
+                                        </View> */}
                                         <View style={{
                                             flexDirection: 'row',
                                             alignItems: 'center'
@@ -190,7 +190,7 @@ const CRUDScreen = ({ navigation }) => {
                     onPressItem={name => {
                         console.log(`selected button: ${name}`);
                         switch (name) {
-                            case 'btnCreateNew': navigation.navigate('CreateProduct')
+                            case 'btnCreateNew': navigation.navigate('CreateProduct', { location: '' })
                                 break
                             case 'btnEdit': Alert.alert('Chọn đối tượng cần chỉnh sửa')
                                 break

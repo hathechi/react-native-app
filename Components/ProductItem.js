@@ -87,7 +87,7 @@ export default ProductItem = (props) => {
                                     {props.item.title}
                                 </Text>
                             </View>
-                            <View style={{
+                            {/* <View style={{
                                 flexDirection: 'row',
                                 alignItems: 'center'
                             }}>
@@ -95,9 +95,9 @@ export default ProductItem = (props) => {
                                 <Text style={{
                                     fontFamily: 'comfortaa',
                                 }}>
-                                    {props.item.address}
+                                    {props.item.address.location.latitude}
                                 </Text>
-                            </View>
+                            </View> */}
                             <View style={{
                                 flexDirection: 'row',
                                 alignItems: 'center'

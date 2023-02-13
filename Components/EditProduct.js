@@ -25,8 +25,8 @@ import * as yup from "yup";
 import axios, { isCancel, AxiosError } from 'axios';
 import Loading from './Loading';
 const EditProduct = ({ route, navigation }) => {
-    const [isLoading, setIsLoading] = useState(false)
     const { itemEdit } = route.params;
+    const [isLoading, setIsLoading] = useState(false)
     const listRateting = [
         '1',
         '2',
@@ -78,13 +78,13 @@ const EditProduct = ({ route, navigation }) => {
         formState: { errors },
     } = useForm({
         defaultValues: {
-            title: '',
-            price: 0,
-            description: '',
-            address: '',
-            image: [],
-            phone: '',
-            rateting: listRateting[0]
+            title: itemEdit.title,
+            price: itemEdit.price,
+            description: itemEdit.description,
+            address: itemEdit.address,
+            image: [itemEdit.image],
+            phone: itemEdit.phone,
+            rateting: itemEdit.rateting
         },
         resolver: yupResolver(schema)
 

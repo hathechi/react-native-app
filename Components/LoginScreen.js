@@ -52,7 +52,7 @@ function LoginScreen({ navigation }) {
 
           // Alert.alert('Login Successful')
           console.log("userName", auth.currentUser.email)
-          setIsLoading(false)
+          // setIsLoading(false)
 
           //Chuyển màn khi đăng nhập thành công
           { navigation.replace('HomeScreen') }
@@ -63,7 +63,7 @@ function LoginScreen({ navigation }) {
         const errorCode = error.code;
         const errorMessage = error.message;
         console.log(errorMessage, errorCode)
-        setIsLoading(false)
+        // setIsLoading(false)
         Alert.alert('Password or Email Incorrect')
         setIsLogin(false)
 
@@ -93,7 +93,7 @@ function LoginScreen({ navigation }) {
   });
   const onSubmit = (data) => {
     console.log("DATA : ", data);
-    setIsLoading(true)
+    // setIsLoading(true)
     handleSignInAuth(data.email, data.pass)
   }
   if (isLoading) {
