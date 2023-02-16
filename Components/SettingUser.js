@@ -71,6 +71,7 @@ const SettingUser = ({ navigation }) => {
                 marginHorizontal: 20,
                 flex: 1
             }}>
+                {/* thechi1832000@gmail.com */}
                 {emailName == 'thechi1832000@gmail.com' ? <TouchableOpacity
                     onPress={() => navigation.navigate('CRUDScreen')}
                     style={styles.button}>

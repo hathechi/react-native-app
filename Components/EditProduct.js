@@ -22,11 +22,34 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
+import MapView from 'react-native-maps';
 import axios, { isCancel, AxiosError } from 'axios';
 import Loading from './Loading';
+import RNModal from 'react-native-modal';
+import _ from 'lodash';
+import Icon from 'react-native-vector-icons/FontAwesome';
+
+
 const EditProduct = ({ route, navigation }) => {
     const { itemEdit } = route.params;
     const [isLoading, setIsLoading] = useState(false)
+    const [modalVisible, setModalVisible] = useState(false);
+
+
+    //Maps
+    const [region, setRegion] = useState({
+        latitude: 12.70766381028743,
+        longitude: 108.06703306246536,
+        latitudeDelta: 0.05,
+        longitudeDelta: 0.05,
+    });
+    const debouncedSetRegion = _.debounce(setRegion, 500);
+    const onRegionChange = (newRegion) => {
+        debouncedSetRegion(newRegion);
+        console.log('Tọa độ EDIT: ', region)
+    };
+
+
     const listRateting = [
         '1',
         '2',
@@ -67,11 +90,10 @@ const EditProduct = ({ route, navigation }) => {
         description: yup.string().required(),
         image: yup.array(),
         rateting: yup.string(),
-        address: yup.string().required(),
+        address: yup.object(),
         price: yup.number().positive().integer().required(),
         phone: yup.number().positive().integer().required(),
     }).required();
-
     const {
         control,
         handleSubmit,
@@ -79,11 +101,11 @@ const EditProduct = ({ route, navigation }) => {
     } = useForm({
         defaultValues: {
             title: itemEdit.title,
-            price: itemEdit.price,
+            price: itemEdit.price + '',
             description: itemEdit.description,
             address: itemEdit.address,
-            image: [itemEdit.image],
-            phone: itemEdit.phone,
+            image: itemEdit.image,
+            phone: itemEdit.phone + '',
             rateting: itemEdit.rateting
         },
         resolver: yupResolver(schema)
@@ -96,28 +118,36 @@ const EditProduct = ({ route, navigation }) => {
     console.log("ID  ", itemEdit.id)
 
     const onSubmit = async (data) => {
-        if (filePathArray.length == 0) {
-            Alert.alert('image not selected yet')
-        } else {
-            data.image = filePathArray
-            console.log("data  ", data)
-            //Edit API
-            setIsLoading(true)
-            const res = await axios.put(urlAPI + '/' + itemEdit.id, data)
+        console.log('itemEdit image', itemEdit.image)
+        console.log('filePathArray ', filePathArray)
 
-            if (res.status === 200) {
-                console.log("edit ok")
-                navigation.replace('HomeScreen')
-                // navigation.pop()
-                setIsLoading(false)
-
-                Alert.alert("Edit Success")
-            } else {
-                console.log("Lỗi")
-                Alert.alert("Edit Error")
-
-            }
+        if (region != null) {
+            data.address = region
         }
+        if (filePathArray.length != 0) {
+            data.image = filePathArray
+        } else {
+            data.image = itemEdit.image
+        }
+        console.log("dataEdit  ", data)
+
+        //Edit API
+        setIsLoading(true)
+        const res = await axios.put(urlAPI + '/' + itemEdit.id, data)
+
+        if (res.status === 200) {
+            console.log("edit ok")
+            navigation.replace('HomeScreen')
+            // navigation.pop()
+            setIsLoading(false)
+
+            Alert.alert("Edit Success")
+        } else {
+            console.log("Lỗi")
+            Alert.alert("Edit Error")
+
+        }
+
 
     }
     if (isLoading) {
@@ -177,18 +207,23 @@ const EditProduct = ({ route, navigation }) => {
                     name="description"
                 ></Controller>
                 {errors.description && <Text style={styles.textError}>{errors.description.message}</Text>}
-                <Controller
-                    control={control}
-
-                    render={({ field: { onChange, onBlur, value } }) => (
-                        <TextInput placeholder='Address'
-                            onChangeText={onChange}
-                            value={value} style={[styles.input, errors.address && styles.borderInputError]}>
-
-                        </TextInput>
-                    )}
-                    name="address"
-                ></Controller>
+                <TouchableOpacity onPress={() => {
+                    setModalVisible(true)
+                }}
+                    style={[styles.input, errors.address && styles.borderInputError]}>
+                    <Controller
+                        control={control}
+                        render={({ field: { onChange, onBlur, value } }) => (
+                            <TextInput placeholder='Address'
+                                onChangeText={onChange}
+                                on editable={false}
+                                selectTextOnFocus={false}
+                                value={region.latitude + ''} style={{ fontSize: 16, }} >
+                            </TextInput>
+                        )}
+                        name="address"
+                    ></Controller>
+                </TouchableOpacity>
                 {errors.description && <Text style={styles.textError}>{errors.address.message}</Text>}
 
                 <View style={{
@@ -217,6 +252,50 @@ const EditProduct = ({ route, navigation }) => {
                     {errors.rateting && <Text style={styles.textError}>{errors.rateting.message}</Text>}
 
                 </View>
+                <RNModal style={{
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                }}
+                    animationType="slide" visible={modalVisible}>
+                    <View style={{
+                        width: '100%',
+                        height: '70%',
+
+                    }}>
+                        <View>
+                            <MapView style={{
+                                width: '100%',
+                                height: '100%',
+
+                            }}
+                                showsUserLocation
+                                region={region}
+                                onRegionChange={onRegionChange}
+                            >
+                            </MapView>
+                            <Icon style={{
+                                position: 'absolute',
+                                zIndex: 99,
+                                top: '46%',
+                                left: '48%'
+                            }} name='thumb-tack' color={'red'} size={50} />
+                        </View>
+                        <TouchableOpacity style={{
+                            marginTop: 10,
+                            width: '100%', height: 60,
+                            backgroundColor: 'orange',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            borderRadius: 10,
+                        }} onPress={() => {
+                            setModalVisible(false)
+                        }}>
+                            <Text style={{ fontSize: 18, color: 'white', fontWeight: 'bold' }}>
+                                GET LOCATION
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                </RNModal>
                 <TouchableOpacity style={{
                     marginTop: 20,
                     width: 300, height: 60,
@@ -253,7 +332,17 @@ const EditProduct = ({ route, navigation }) => {
                             margin: 10
                         }} source={{ uri: item }}></Image>
                     }}
-                /> : null}
+                /> : <FlatList
+                    horizontal
+                    data={itemEdit.image}
+                    renderItem={({ item }) => {
+                        return <Image style={{
+                            width: 300,
+                            height: 200,
+                            margin: 10
+                        }} source={{ uri: item }}></Image>
+                    }}
+                />}
 
                 <TouchableOpacity
                     onPress={

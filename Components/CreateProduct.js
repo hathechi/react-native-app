@@ -99,7 +99,7 @@ function CreateProduct({ navigation }) {
     } = useForm({
         defaultValues: {
             title: '',
-            price: 0,
+            price: '',
             description: '',
             address: { region },
             image: [],
@@ -115,7 +115,6 @@ function CreateProduct({ navigation }) {
         } else {
             data.image = filePathArray
             data.address = region
-            console.log("data  ", data)
             setIsLoading(true)
             //Post API
             const res = await axios.post(urlAPI, data)
@@ -249,12 +248,14 @@ function CreateProduct({ navigation }) {
                     animationType="slide" visible={modalVisible}>
                     <View style={{
                         width: '100%',
-                        height: '80%',
+                        height: '70%',
+
                     }}>
                         <View>
                             <MapView style={{
                                 width: '100%',
                                 height: '100%',
+
                             }}
                                 showsUserLocation
                                 region={region}

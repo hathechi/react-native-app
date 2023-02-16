@@ -7,6 +7,7 @@ import SettingUser from './SettingUser';
 import CallAPI from './CallAPI';
 import CreateProduct from './CreateProduct'
 import CRUDScreen from './CRUDScreen';
+import ListImage from './ListImage';
 const Tab = createBottomTabNavigator();
 // const tabs = {
 //     Home: { // < Screen name
@@ -43,16 +44,8 @@ const activeColor = 'black'
 const inActiveColor = '#bfbfbf'
 function HomeScreen() {
     return (
-        // <NavigationContainer>
-        <Tab.Navigator
-        // tabBar={props => (
-        //     <AnimatedTabBar tabs={tabs} {...props} />
-        // )}
-        // screenOptions={{
-        //     headerShown: false
-        // }}
 
-        >
+        <Tab.Navigator>
 
             <Tab.Screen name="Home" component={CallAPI}
                 options={{
@@ -67,16 +60,14 @@ function HomeScreen() {
 
                 }} />
 
-            <Tab.Screen name="CRUDScreen" component={CRUDScreen}
+            <Tab.Screen name="ListImage" component={ListImage}
 
                 options={{
                     tabBarShowLabel: false,
-
-                    headerTitleAlign: 'center',
-                    title: 'Products',
+                    headerShown: false,
                     tabBarHideOnKeyboard: true,
                     tabBarIcon: ({ color }) => (
-                        <Icon name="plus" size={32} color={color} />
+                        <Icon name="fire" size={32} color={color} />
                     ),
                     tabBarActiveTintColor: activeColor,
                     tabBarInactiveTintColor: inActiveColor

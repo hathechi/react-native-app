@@ -16,6 +16,7 @@ import SettingUser from './Components/SettingUser';
 import CRUDScreen from './Components/CRUDScreen';
 import EditProduct from './Components/EditProduct';
 import Maps from './Components/Maps';
+import ListImage from './Components/ListImage';
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
 import { firebaseConfig } from "./config_firebase";
@@ -53,12 +54,23 @@ export default function App() {
                     name="Maps"
                     component={Maps}
                 />
+
                 <Stack.Screen
                     name="LoginScreen"
                     component={LoginScreen}
                     options={{ headerShown: false }}
                 />
+                <Stack.Screen
+                    name="ListImage"
+                    component={ListImage}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="DetailItem"
+                    component={DetailItem}
+                    options={{ headerShown: false }} //ẩn thanh bar
 
+                />
                 <Stack.Screen
                     name="CreateProduct"
                     component={CreateProduct}
@@ -90,12 +102,7 @@ export default function App() {
                     component={CallAPI}
                     options={{ headerShown: false }} //ẩn thanh bar
                 />
-                <Stack.Screen
-                    name="DetailItem"
-                    component={DetailItem}
-                    options={{ headerShown: false }} //ẩn thanh bar
 
-                />
                 <Stack.Screen
                     name="CRUDScreen"
                     component={CRUDScreen}
