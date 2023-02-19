@@ -17,6 +17,7 @@ import CRUDScreen from './Components/CRUDScreen';
 import EditProduct from './Components/EditProduct';
 import Maps from './Components/Maps';
 import ListImage from './Components/ListImage';
+import FogotPassword from './Components/FogotPassword';
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
 import { firebaseConfig } from "./config_firebase";
@@ -24,6 +25,8 @@ import { async } from '@firebase/util';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+import Toast from 'react-native-toast-message';
+
 export default function App() {
     const app = initializeApp(firebaseConfig)
     const auth = getAuth(app)
@@ -46,6 +49,11 @@ export default function App() {
         <NavigationContainer>
             <Stack.Navigator>
                 <Stack.Screen
+                    name="LoginScreen"
+                    component={LoginScreen}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
                     name="HomeScreen"
                     component={HomeScreen}
                     options={{ headerShown: false }}
@@ -55,9 +63,10 @@ export default function App() {
                     component={Maps}
                 />
 
+
                 <Stack.Screen
-                    name="LoginScreen"
-                    component={LoginScreen}
+                    name="FogotPassword"
+                    component={FogotPassword}
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen
@@ -118,6 +127,7 @@ export default function App() {
                 />
 
             </Stack.Navigator>
+            <Toast />
         </NavigationContainer>
     );
 };

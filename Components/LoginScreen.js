@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import PushScreen from '../Init/PushScreen';
+import React, { useEffect, useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
+  // CheckBox,
   TextInput,
   Image,
   ToastAndroid,
@@ -19,43 +19,62 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
-
+import CheckBox from '@react-native-community/checkbox'
 import { initializeApp } from "firebase/app";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { firebaseConfig } from "../config_firebase";
 import Loading from './Loading';
 
+//Lưu thông tin đăng nhập 
+import AsyncStorage from '@react-native-community/async-storage';
+
 
 function LoginScreen({ navigation }) {
   const [isLogin, setIsLogin] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
+  const [isCheckbox, setIsCheckbox] = useState(false)
+  const [isShowPass, setIsShowPass] = useState(true)
+
+
+  //email password Local storage 
+  const [emailLocal, setEmailLocal] = useState('')
+  const [passwordLocal, setPasswordLocal] = useState('')
+
   const app = initializeApp(firebaseConfig)
   const auth = getAuth(app)
   onAuthStateChanged(auth, (user) => {
     if (user) {
 
-      console.log('User email: ', user.email);
-      () => navigation.navigate('HomeScreen')
+      console.log('User URL: ', user.photoURL);
+      // console.log('User email: ', user.email);
+      // console.log('User pass: ', user.password);
+      // () => navigation.navigate('HomeScreen')
     } else {
       // user is not logged in
-      console.log('NO LoginScreen');
+      console.log('No Login');
     }
   });
+  useEffect(() => {
+    checkLoginInfo()
+  }, []);
+
   //FireBase
   const handleSignInAuth = async (email, password) => {
     await signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Signed in 
         const user = userCredential.user;
-        // console.log("firebase", user.email)
         if (user != null) {
+          if (isCheckbox) {
+            saveLoginInfo(email, password)
+            console.log("save")
 
-          // Alert.alert('Login Successful')
-          console.log("userName", auth.currentUser.email)
-          // setIsLoading(false)
-
+          } else {
+            deleteLoginInfo()
+            console.log("delete email name")
+          }
           //Chuyển màn khi đăng nhập thành công
-          { navigation.replace('HomeScreen') }
+          navigation.replace('HomeScreen')
         }
 
       })
@@ -70,22 +89,71 @@ function LoginScreen({ navigation }) {
       });
   }
 
-  const [isShowPass, setIsShowPass] = useState(true)
+  // Lưu tên đăng nhập và mật khẩu vào AsyncStorage
+  async function saveLoginInfo(username, password) {
+    try {
+      await AsyncStorage.setItem('email', username);
+      await AsyncStorage.setItem('password', password.toString());
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  // Kiểm tra xem có thông tin đăng nhập trong AsyncStorage hay không
+  async function checkLoginInfo() {
+    try {
+      const email = await AsyncStorage.getItem('email');
+      const password = await AsyncStorage.getItem('password');
+
+
+      if (email !== null && password !== null) {
+
+
+        setValue('email', email, {
+          shouldValidate: true,
+          shouldDirty: true
+        }),
+          setValue('pass', password, {
+            shouldValidate: true,
+            shouldDirty: true
+          })
+
+        // setEmailLocal(email)
+        // setPasswordLocal(password)
+        setIsCheckbox(true)
+        // console.log("LOCAL: ", emailLocal, passwordLocal);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  // Xóa thông tin đăng nhập khỏi AsyncStorage khi người dùng đăng xuất
+  async function deleteLoginInfo() {
+    try {
+      await AsyncStorage.removeItem('email');
+      await AsyncStorage.removeItem('password');
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
 
   const schema = yup.object({
-    email: yup.string().email().required(),
-    pass: yup.number().positive().required()
+    email: yup.string().email().required("Không bỏ trống"),
+    pass: yup.number('Mật khẩu phải là số').positive().required()
 
   }).required();
-
+  // console.log('log pass:', emailLocal, passwordLocal)
   const {
     control,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm({
     defaultValues: {
       email: '',
       pass: '',
+      // email: emailLocal != '' ? emailLocal : '',
+      // pass: passwordLocal != '' ? passwordLocal : '',
 
     },
     resolver: yupResolver(schema)
@@ -157,6 +225,19 @@ function LoginScreen({ navigation }) {
                 </TouchableOpacity>
               </View>
               {errors.pass && <Text style={styles.textError}>{errors.pass.message}</Text>}
+
+              <View style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                margin: 20,
+              }}>
+                <CheckBox onValueChange={setIsCheckbox}
+                  value={isCheckbox}
+                />
+                <Text>
+                  Remember me
+                </Text>
+              </View>
               <View style={{
                 alignItems: 'center',
                 marginTop: 30
@@ -208,7 +289,7 @@ function LoginScreen({ navigation }) {
               </TouchableOpacity>
             </View>
             <View>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => navigation.navigate('FogotPassword')}>
                 <Text style={{
                   fontSize: 16,
                   color: '#0b7dd4',

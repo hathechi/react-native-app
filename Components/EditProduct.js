@@ -28,6 +28,7 @@ import Loading from './Loading';
 import RNModal from 'react-native-modal';
 import _ from 'lodash';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import showToast from './ToastMessage';
 
 
 const EditProduct = ({ route, navigation }) => {
@@ -141,7 +142,8 @@ const EditProduct = ({ route, navigation }) => {
             // navigation.pop()
             setIsLoading(false)
 
-            Alert.alert("Edit Success")
+            showToast('success', 'Edit Success')
+
         } else {
             console.log("Lỗi")
             Alert.alert("Edit Error")
@@ -367,14 +369,14 @@ const EditProduct = ({ route, navigation }) => {
 const styles = StyleSheet.create({
     input: {
         color: 'black',
-        marginTop: 30,
+        marginTop: 20,
         fontSize: 16,
         paddingStart: 20,
         width: "90%",
         backgroundColor: "#DDDDDD",
         height: 60,
-        borderRadius: 20,
-        paddingLeft: 10,
+        borderRadius: 5,
+        paddingLeft: 20,
 
     },
     borderInputError: {

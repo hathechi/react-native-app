@@ -26,10 +26,10 @@ export default function CallAPI({ navigation }) {
             }
             if (response.status == 200) {
                 setProducts(response.data)
+                setIsLoading(false)
                 if (response.data == null) {
                     Alert.alert('NO DATA')
                 }
-                setIsLoading(false)
             }
         } catch (error) {
             console.error(error);
@@ -74,6 +74,7 @@ export default function CallAPI({ navigation }) {
                             }} />
                         <TouchableOpacity onPress={
                             () => {
+                                setIsLoading(true)
                                 fetchPost(),
                                     console.log(search)
                             }

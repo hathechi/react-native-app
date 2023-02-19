@@ -2,7 +2,7 @@ import { Image, StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 import { React, useEffect, useState } from 'react'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { initializeApp } from "firebase/app";
-import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
 import { firebaseConfig } from "../config_firebase";
 
 import { async } from '@firebase/util';
@@ -11,6 +11,7 @@ const SettingUser = ({ navigation }) => {
     const app = initializeApp(firebaseConfig)
     const auth = getAuth(app)
     const [emailName, setEmailName] = useState('')
+    const [urlImage, setUrlImage] = useState('')
     const logout = async () => {
         try {
             await signOut(auth);
@@ -23,8 +24,10 @@ const SettingUser = ({ navigation }) => {
         if (user) {
             // const user = auth.currentUser
             if (user) {
-                console.log('User email: ', user.email);
+                console.log('User name: ', user.displayName);
                 setEmailName(user.email)
+                console.log('User URL: ', user.photoURL);
+                setUrlImage(user.photoURL)
             }
         } else {
             // user is not logged in
@@ -54,7 +57,8 @@ const SettingUser = ({ navigation }) => {
                         borderWidth: 1,
                         borderColor: 'black',
                         borderRadius: 400,
-                    }} source={require('../assets/images/avatar.jpeg')} />
+                    }} source={urlImage != '' ? { uri: urlImage } :
+                        require('../assets/images/avatarCamera.png')} />
                     <Icon style={{
                         position: 'absolute',
                         right: 0,

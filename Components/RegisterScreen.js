@@ -6,7 +6,9 @@ import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 import { initializeApp } from "firebase/app";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { getStorage, ref, uploadBytes, uploadFile, getDownloadURL } from 'firebase/storage';
+import { convertUriToBlob } from '../config_firebase';
 import { firebaseConfig } from "../config_firebase";
 import Loading from './Loading';
 import {
@@ -24,13 +26,39 @@ import {
     View,
     Alert,
 } from 'react-native';
+import showToast from './ToastMessage';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+
+
 
 
 export default function RegisterScreen({ navigation }) {
     const [isLoading, setIsLoading] = useState(false)
+    const [imageUrl, setImageUrl] = useState('');
     const app = initializeApp(firebaseConfig)
     const auth = getAuth(app)
 
+    const chooseFile = (type) => {
+        let options =
+        {
+            mediaType: type,
+            maxWidth: 300,
+            maxHeight: 550,
+            quality: 1,
+            // selectionLimit: 5
+        };
+        launchImageLibrary(options, (response) => {
+            if (response.didCancel) {
+                console.log('User cancelled image picker');
+            } else if (response.error) {
+                console.log('ImagePicker Error: ', response.error);
+            } else {
+                const uri = response.assets[0].uri
+                console.log("image register ", response)
+                setImageUrl(uri)
+            };
+        })
+    };
 
     const schema = yup.object({
         user: yup.string().required(),
@@ -60,13 +88,50 @@ export default function RegisterScreen({ navigation }) {
     const [isShowPass, setIsShowPass] = useState(true)
     //open datePicker
     const [open, setOpen] = useState(false)
+
+    const upLoadImageToFireBase = async () => {
+        // Tạo tham chiếu tới file trên Firebase Storage
+        const storage = getStorage();
+        // Upload ảnh lên Firebase Storage
+        //convert từ uri sang blob để upload
+        const blob = await convertUriToBlob(imageUrl);
+        const fileRef = ref(storage, "images/" + Date.now() + ".png");
+        const snapshot = await uploadBytes(fileRef, blob);
+        console.log("Uploaded a blob or file!", snapshot);
+        const downloadUrl = await getDownloadURL(fileRef);
+
+        console.log("File available at", downloadUrl);
+        return downloadUrl
+
+    }
+
     //FireBase
-    const handleSignUpAuth = async (email, password, name) => {
-        await createUserWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
+    const handleSignUpAuth = (email, password, name) => {
+        createUserWithEmailAndPassword(auth, email, password)
+            .then(async (userCredential) => {
                 // Signed in 
                 const user = userCredential.user;
                 console.log("firebase", user.email)
+                // const urlImage = upLoadImageToFireBase()
+                // Tạo tham chiếu tới file trên Firebase Storage
+                const storage = getStorage();
+                // Upload ảnh lên Firebase Storage
+                //convert từ uri sang blob để upload
+                const blob = await convertUriToBlob(imageUrl);
+                const fileRef = ref(storage, "images/" + Date.now() + ".png");
+                const snapshot = await uploadBytes(fileRef, blob);
+                console.log("Uploaded a blob or file!", snapshot);
+                const downloadUrl = await getDownloadURL(fileRef);
+
+                console.log("File available at", downloadUrl);
+                await updateProfile(user, {
+                    displayName: name,
+                    photoURL: downloadUrl,
+                }).then(() => {
+                    console.log('URL', user.photoURL)
+                }).catch((error) => {
+                    console.log(error);
+                });
 
                 if (user != null) {
 
@@ -74,7 +139,8 @@ export default function RegisterScreen({ navigation }) {
                     console.log("userName", auth.currentUser.email)
                     //Chuyển màn khi đăng kí thành công
                     navigation.replace('LoginScreen')
-                    Alert.alert('Register Successful')
+                    showToast('success', 'Register Successful')
+
                 }
 
             })
@@ -85,17 +151,20 @@ export default function RegisterScreen({ navigation }) {
                 setIsLoading(false)
                 console.log(errorMessage, errorCode)
             });
+
+
     }
 
     const onSubmit = (data) => {
         data.date = format(date, 'dd-MM-yyyy')
 
         if (data.pass != data.cfpass) {
-            Alert.alert('two passwords must be the same')
+            showToast('error', '2 password is not be same')
+
         } else {
             setIsLoading(true)
-            handleSignUpAuth(data.email, data.pass)
-            console.log("DATA : ", data.email, data.pass);
+            handleSignUpAuth(data.email, data.pass, data.user)
+            console.log("DATA : ", data.email, data.pass, data.user);
 
         }
 
@@ -123,11 +192,25 @@ export default function RegisterScreen({ navigation }) {
                     }}>
                         Register for free !!
                     </Text>
-                    <Image style={{
-                        width: '80%',
-                        height: 150,
-                        marginTop: 30
-                    }} source={require('../assets/images/register.png')} />
+                    <TouchableOpacity onPress={() => chooseFile('photo')}>
+                        <View style={{
+                            marginTop: 20
+                        }}>
+                            <Image style={{
+                                width: 150,
+                                height: 150,
+                                borderWidth: 1,
+                                borderColor: 'black',
+                                borderRadius: 400,
+                            }} source={imageUrl != '' ? { uri: imageUrl } :
+                                require('../assets/images/avatarCamera.png')} />
+                            <Icon style={{
+                                position: 'absolute',
+                                right: 0,
+                                margin: 20
+                            }} name='camera' color={'black'} size={30} />
+                        </View>
+                    </TouchableOpacity>
                 </View>
                 <View style={{ marginStart: 20, marginEnd: 20, marginTop: 20 }}>
                     <View style={[styles.viewStyle, errors.email && styles.borderError]}>
@@ -272,10 +355,7 @@ export default function RegisterScreen({ navigation }) {
                         marginTop: 30
                     }}>
                         <TouchableOpacity onPress={
-
                             handleSubmit(onSubmit)
-                            // console.log(date)
-
                         }
                             style={{
                                 marginTop: 20,
@@ -305,7 +385,7 @@ export default function RegisterScreen({ navigation }) {
                     </View>
                 </View>
             </ScrollView>
-        </SafeAreaView>
+        </SafeAreaView >
     )
 }
 const styles = StyleSheet.create({

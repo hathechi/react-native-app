@@ -26,6 +26,7 @@ import * as yup from "yup";
 import axios, { isCancel, AxiosError } from 'axios';
 import Loading from './Loading';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import showToast from './ToastMessage';
 //maps
 import MapView from 'react-native-maps';
 import { Marker } from 'react-native-maps';
@@ -111,7 +112,8 @@ function CreateProduct({ navigation }) {
     const urlAPI = 'https://63e5c253c8839ccc284b255a.mockapi.io/product/product'
     const onSubmit = async (data) => {
         if (filePathArray.length == 0) {
-            Alert.alert('image not selected yet')
+            showToast('error', 'Image not selected yet')
+
         } else {
             data.image = filePathArray
             data.address = region
@@ -120,9 +122,10 @@ function CreateProduct({ navigation }) {
             const res = await axios.post(urlAPI, data)
             if (res.status === 201) {
                 console.log("post ok")
+                showToast('success', 'Post Success')
+
                 navigation.replace('HomeScreen')
-                // navigation.pop()
-                Alert.alert("Post Success")
+
                 setIsLoading(false)
             } else {
                 console.log("Lỗi")
@@ -131,28 +134,7 @@ function CreateProduct({ navigation }) {
         }
     }
     const [modalVisible, setModalVisible] = useState(false);
-    // const CustomModal = () => {
-    //     return (
-    //         <View >
-    //             <TouchableOpacity onPress={() => setModalVisible(true)}>
-    //                 <Text>Open Modal</Text>
-    //             </TouchableOpacity>
-    //             <Modal style={{
-    //                 backgroundColor: 'red',
-    //                 width: 300,
-    //                 height: 500
-    //             }}
-    //                 animationType="slide" transparent={false} visible={modalVisible}>
-    //                 <View>
-    //                     <Text>Hello World!</Text>
-    //                     <TouchableOpacity onPress={() => setModalVisible(false)}>
-    //                         <Text>Close Modal</Text>
-    //                     </TouchableOpacity>
-    //                 </View>
-    //             </Modal>
-    //         </View>
-    //     );
-    // };
+
     if (isLoading) {
         return <Loading />
     }
