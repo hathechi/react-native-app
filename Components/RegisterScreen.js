@@ -89,21 +89,21 @@ export default function RegisterScreen({ navigation }) {
     //open datePicker
     const [open, setOpen] = useState(false)
 
-    const upLoadImageToFireBase = async () => {
-        // Tạo tham chiếu tới file trên Firebase Storage
-        const storage = getStorage();
-        // Upload ảnh lên Firebase Storage
-        //convert từ uri sang blob để upload
-        const blob = await convertUriToBlob(imageUrl);
-        const fileRef = ref(storage, "images/" + Date.now() + ".png");
-        const snapshot = await uploadBytes(fileRef, blob);
-        console.log("Uploaded a blob or file!", snapshot);
-        const downloadUrl = await getDownloadURL(fileRef);
+    // const upLoadImageToFireBase = async () => {
+    //     // Tạo tham chiếu tới file trên Firebase Storage
+    //     const storage = getStorage();
+    //     // Upload ảnh lên Firebase Storage
+    //     //convert từ uri sang blob để upload
+    //     const blob = await convertUriToBlob(imageUrl);
+    //     const fileRef = ref(storage, "images/" + Date.now() + ".png");
+    //     const snapshot = await uploadBytes(fileRef, blob);
+    //     console.log("Uploaded a blob or file!", snapshot);
+    //     const downloadUrl = await getDownloadURL(fileRef);
 
-        console.log("File available at", downloadUrl);
-        return downloadUrl
+    //     console.log("File available at", downloadUrl);
+    //     return downloadUrl
 
-    }
+    // }
 
     //FireBase
     const handleSignUpAuth = (email, password, name) => {
@@ -115,6 +115,10 @@ export default function RegisterScreen({ navigation }) {
                 // const urlImage = upLoadImageToFireBase()
                 // Tạo tham chiếu tới file trên Firebase Storage
                 const storage = getStorage();
+                if (imageUrl == '') {
+                    Alert.alert('Choice Avatar!!!')
+                    return
+                }
                 // Upload ảnh lên Firebase Storage
                 //convert từ uri sang blob để upload
                 const blob = await convertUriToBlob(imageUrl);

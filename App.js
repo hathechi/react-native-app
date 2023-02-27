@@ -18,6 +18,7 @@ import EditProduct from './Components/EditProduct';
 import Maps from './Components/Maps';
 import ListImage from './Components/ListImage';
 import FogotPassword from './Components/FogotPassword';
+import KiemTraScreen from './Components/KiemTraScreen';
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
 import { firebaseConfig } from "./config_firebase";
@@ -48,6 +49,11 @@ export default function App() {
     return (
         <NavigationContainer>
             <Stack.Navigator>
+                {/* <Stack.Screen
+                    name="KiemTraScreen"
+                    component={KiemTraScreen}
+                    options={{ headerShown: false }}
+                /> */}
                 <Stack.Screen
                     name="LoginScreen"
                     component={LoginScreen}
